@@ -5,13 +5,12 @@ vim.opt.nu = true
 -- Makes the linenumbers relative
 vim.opt.relativenumber = true
 -- Makes it so that the cursor blinks
-vim.opt.guicursor ="n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 vim.opt.confirm = true
 
 
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
@@ -42,7 +41,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- REMAPS --
 vim.g.mapleader = " "
 vim.api.nvim_set_keymap('n', '<leader>pv', ':Neotree position=current<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>db', ':DBUI<CR>', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('n', '<leader>popen_currentv', ':Ex<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>db', ':DBUIToggle<CR>', { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>S", vim.cmd.wa)
 vim.keymap.set('t', "<leader>nn", vim.cmd.bd)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -60,8 +60,15 @@ vim.keymap.set("x", "<leader>p", "\"_dp")
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set('n', 'gb', ':b#<CR>', { noremap = true, silent = true })
 
--- REMAP DONE --
 
+-- vim.keymap.set('i', '<RIGHT>', 'copilot#Accept("\\<CR>")', {
+--     expr = true,
+--     replace_keycodes = false
+-- })
+-- vim.g.copilot_no_tab_map = true
+
+
+-- REMAP DONE --
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
