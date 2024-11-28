@@ -28,10 +28,16 @@ return {
       lspconfig.sqlls.setup({
         capabilities = capabilities
       })
+      lspconfig.csharp_ls.setup({
+        capabilities = capabilities
+      })
       lspconfig.sqls.setup({
         capabilities = capabilities
       })
       lspconfig.cssls.setup({
+        capabilities = capabilities
+      })
+      lspconfig.angularls.setup({
         capabilities = capabilities
       })
 			-- lspconfig.ts_ls.setup({
@@ -71,6 +77,7 @@ return {
       })
 
 			lspconfig.html.setup({
+          filetypes = {'html, cshtml'},
         capabilities = capabilities
 			})
 			lspconfig.htmx.setup({

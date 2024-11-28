@@ -8,7 +8,7 @@ vim.opt.relativenumber = true
 vim.opt.confirm = true
 
 
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
@@ -41,8 +41,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- REMAPS --
 vim.g.mapleader = " "
 vim.api.nvim_set_keymap('n', '<leader>pv', ':Neotree position=current<CR>', { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap('n', '<leader>pv', ':Ex<CR>', { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap('n', '<leader>popen_currentv', ':Ex<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>db', ':DBUIToggle<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>mdv', ':MarkdownPreviewToggle<CR>', { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>S", vim.cmd.wa)
 vim.keymap.set('t', "<leader>nn", vim.cmd.bd)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
