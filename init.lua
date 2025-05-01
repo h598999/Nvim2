@@ -1,4 +1,4 @@
--- SET --initl
+-- SET --initlvim
 vim.g.mapleader = " "
 -- Makes it so that i can see the current linenumber
 vim.opt.nu = true
@@ -6,6 +6,8 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 -- Makes it so that the cursor blinks
 vim.opt.confirm = true
+
+vim.opt.clipboard = "unnamedplus"
 
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
@@ -35,6 +37,11 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     end,
 })
 
+vim.g.vimtex_complete_enabled = 1
+vim.g.vimtex_complete_resolve = 1
+
+vim.g.vimtex_complete_popup_position = 'bottom'
+
 -- SET DONE --
 
 -- REMAPS --
@@ -42,11 +49,6 @@ vim.g.mapleader = " "
 vim.api.nvim_set_keymap("n", "<leader>pv", ":Neotree position=current<CR>", { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap('n', '<leader>pv', ':Ex<CR>', { noremap = true, silent = true })
 -- vim.api.nvim_set_keymap('n', '<leader>popen_currentv', ':Ex<CR>', { noremap = true, silent = true })
-vim.keymap.set("n", "==", function()
-    local save_cursor = vim.fn.getpos(".") -- Save cursor position
-    vim.cmd("normal! gg=G") -- Format the entire file
-    vim.fn.setpos(".", save_cursor) -- Restore cursor position
-end, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>db", ":DBUIToggle<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>mdv", ":MarkdownPreviewToggle<CR>", { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>S", vim.cmd.wa)
@@ -54,6 +56,14 @@ vim.keymap.set("t", "<leader>nn", vim.cmd.bd)
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 vim.keymap.set("n", "<leader>gv", ":Neogit<CR>", { noremap = true, silent = true })
+-- Toggle wrap function
+local function toggle_wrap()
+  vim.opt.wrap = not vim.opt.wrap:get()  -- Toggle wrap
+end
+
+-- Normal mode mapping (e.g., <leader>tw)
+vim.keymap.set('n', '<leader>tw', toggle_wrap, { noremap = true, silent = true, desc = "Toggle line wrapping" })
+
 -- vim.keymap.set("v", "<leader>gcc", "jkI//<esc>")
 
 vim.keymap.set("n", "J", "mzJ`z")
@@ -73,6 +83,10 @@ vim.keymap.set("n", "gb", ":b#<CR>", { noremap = true, silent = true })
     -- vim.g.copilot_no_tab_map = true
 
     -- REMAP DONE --
+    vim.api.nvim_set_hl(0, "FloatBorder", {bg='#3B4252', fg='#5E81AC'});
+    vim.api.nvim_set_hl(0, "NormalFloat", {bg='#3B4252'});
+    vim.api.nvim_set_hl(0, "TelescopeNormal", {bg="#3B4252"});
+    vim.api.nvim_set_hl(0, "TelescopeBorder", {bg="#3B4252"});
 
     local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
     if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -85,8 +99,60 @@ vim.keymap.set("n", "gb", ":b#<CR>", { noremap = true, silent = true })
             lazypath,
         })
     end
+
+    -- Toggle wrap function
+local function toggle_wrap()
+  vim.opt.wrap = not vim.opt.wrap:get()
+end
+
+-- Normal mode mapping (e.g., <leader>tw)
+vim.keymap.set('n', '<leader>tw', toggle_wrap, { noremap = true, silent = true, desc = "Toggle line wrapping" })
     vim.opt.rtp:prepend(lazypath)
 
     local plugins = {}
     local opts = {}
     require("lazy").setup("plugins")
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "tex",
+  callback = function()
+    -- Set buffer-local keymaps for tex files
+    vim.api.nvim_buf_set_keymap(0, "n", "j", "gj", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, "n", "k", "gk", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, "v", "j", "gj", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(0, "v", "k", "gk", { noremap = true, silent = true })
+  end
+})
+
+local schemeFile = vim.fn.stdpath("cache").."/last_colorscheme.txt"
+local colorSchemes = {"catppuccin", "rose-pine", "gruvbox", "github_dark", "onedark", "material"}
+
+local fileRead = io.open(schemeFile, "r")
+local i = 1;
+if fileRead then
+    local contents = tonumber(fileRead:read("*a"))
+    if contents then
+        i = contents
+    end
+end
+
+local function toggleScheme()
+    if (i >= #colorSchemes) then
+        i = 1
+    else
+        i = i+1
+    end
+    local color = colorSchemes[i]
+    ColorMyPencils(color)
+
+    local writeFile = io.open(schemeFile, "w")
+    if writeFile then
+        writeFile:write(i)
+        writeFile:close()
+    end
+    print(colorSchemes[i])
+end
+
+vim.keymap.set('n', '<leader>cs', toggleScheme,{ noremap = true, silent = true, desc = "Toggle colorScheme" })
+
+ColorMyPencils(colorSchemes[i]);
