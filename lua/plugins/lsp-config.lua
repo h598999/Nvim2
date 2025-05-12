@@ -1,5 +1,13 @@
 return {
     {
+        "rafamadriz/friendly-snippets",
+        dependencies = { "L3MON4D3/LuaSnip" },
+        config = function()
+            require("luasnip.loaders.from_vscode").lazy_load()
+            require("luasnip.loaders.from_lua").lazy_load({paths = "~/.config/nvim/lua/snippets"})
+        end,
+    },
+    {
         "williamboman/mason.nvim",
         config = function()
             require("mason").setup()
@@ -9,7 +17,7 @@ return {
         "williamboman/mason-lspconfig.nvim",
         config = function()
             require("mason-lspconfig").setup({
-                -- ensure_installed = { "lua_ls", "jdtls" },
+                ensure_installed = { "lua_ls" },
             })
         end,
     },
@@ -18,8 +26,33 @@ return {
         config = function()
             local capabilities = require("cmp_nvim_lsp").default_capabilities()
             local lspconfig = require("lspconfig")
+            local love_path = "/home/jonas/.local/share/nvim/mason/packages/lua-language-server/libexec/meta/3rd/love2d"
 
-            lspconfig.lua_ls.setup({ capabilities = capabilities })
+            lspconfig.lua_ls.setup({
+                capabilities = capabilities,
+                settings = {
+                    Lua = {
+                        runtime = {
+                            version = 'LuaJIT',
+                        },
+                        diagnostics = {
+                            globals = { 'vim' },
+                        },
+                        workspace = {
+                            checkThirdParty = false,
+                            library = {
+                                vim.env.VIMRUNTIME,
+                                love_path
+                            },
+                            maxPreload = 1000,
+                            preloadFileSize = 100,
+                        },
+                        telemetry = {
+                            enable = false,
+                        },
+                    },
+                },
+            })
             lspconfig.rust_analyzer.setup({ capabilities = capabilities })
             lspconfig.svelte.setup({ capabilities = capabilities })
             lspconfig.sqlls.setup({ capabilities = capabilities })
@@ -29,6 +62,7 @@ return {
             lspconfig.angularls.setup({ capabilities = capabilities })
             lspconfig.hls.setup({ capabilities = capabilities })
             lspconfig.intelephense.setup({ capabilities = capabilities })
+            lspconfig.hls.setup({ capabilities = capabilities })
             lspconfig.ltex.setup({
                 capabilities = capabilities,
                 filetypes = {"tex"},
@@ -197,6 +231,7 @@ return {
                 },
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
+                    { name = "luasnip" },
                     { name = "buffer" },
                     { name = "path" },
                     { name = "vimtex"},
@@ -205,3 +240,4 @@ return {
         end,
     },
 }
+

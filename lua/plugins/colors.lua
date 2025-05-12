@@ -4,7 +4,7 @@ local palettes = {
   -- Everything defined under all will be applied to each style.
   all = {
     -- Each palette defines these colors:
-    --   black, gray, blue, green, magenta, pink, red, white, yellow, cyan
+    --   blacj, gray, blue, green, magenta, pinj, red, white, yellow, cyan
     --
     -- These colors have 2 shades: base, and bright
 
@@ -35,6 +35,7 @@ local palettes = {
     comment = '#636e7b',
   },
 }
+
 
 -- Spec's (specifications) are a mapping of palettes to logical groups that will be
 -- used by the groups. Some examples of the groups that specs map would be:
@@ -93,7 +94,7 @@ local options = {
 }
 function ColorMyPencils(color)
     color = color or "rose-pine"
-    vim.cmd.colorscheme(color)
+    -- vim.cmd.colorscheme(color)
     vim.opt.guicursor = "n:block-CursorNormal,i:block-CursorInsert-blinkon1-blinkoff1"
     -- Definer highlight grupper
     vim.cmd([[
@@ -112,7 +113,7 @@ return {
                 underline = false,
                 bold = true,
                 italic = {
-                    strings = false,
+                    strings = true,
                     emphasis = false,
                     comments = false,
                     operators = false,
@@ -132,6 +133,90 @@ return {
             })
         end,
     },
+    {
+        "eldritch-theme/eldritch.nvim",
+        lazy = false,
+        priority = 1000,
+        opts = {},
+        config = function ()
+            require("eldritch").setup({
+                transparent = true,
+                styles = {
+                    sidebars = "transparent",
+                    floats = "transparent"
+                }
+            })
+        end
+    },
+    {
+        "scottmckendry/cyberdream.nvim",
+        lazy = false,
+        priority = 1000,
+        config = function ()
+            require("cyberdream").setup({
+                -- Set light or dark variant
+                -- variant = "default", -- use "light" for the light variant. Also accepts "auto" to set dark or light colors based on the current value of `vim.o.background`
+
+                -- Enable transparent background
+                transparent = true,
+
+                -- Reduce the overall saturation of colours for a more muted look
+                saturation = 1, -- accepts a value between 0 and 1. 0 will be fully desaturated (greyscale) and 1 will be the full color (default)
+
+                -- Enable italics comments
+                italic_comments = true,
+
+                -- Replace all fillchars with ' ' for the ultimate clean look
+                hide_fillchars = false,
+
+                -- Apply a modern borderless look to pickers like Telescope, Snacks Picker & Fzf-Lua
+                borderless_pickers = true,
+
+                -- Set terminal colors used in `:terminal`
+                terminal_colors = true,
+
+                -- Improve start up time by caching highlights. Generate cache with :CyberdreamBuildCache and clear with :CyberdreamClearCache
+                cache = false,
+
+                -- Override highlight groups with your own colour values
+                highlights = {
+                    -- Highlight groups to override, adding new groups is also possible
+                    -- See `:h highlight-groups` for a list of highlight groups or run `:hi` to see all groups and their current values
+
+                    -- Example:
+                    Comment = { fg = "#696969", bg = "NONE", italic = true },
+
+                    -- More examples can be found in `lua/cyberdream/extensions/*.lua`
+                },
+
+                -- Override a highlight group entirely using the built-in colour palette
+                overrides = function(colors) -- NOTE: This function nullifies the `highlights` option
+                    -- Example:
+                    return {
+                        Comment = { fg = colors.green, bg = "NONE", italic = true },
+                        ["@property"] = { fg = colors.magenta, bold = true },
+                    }
+                end,
+
+                -- Override a color entirely
+                colors = {
+                    -- For a list of colors see `lua/cyberdream/colours.lua`
+                    -- Example:
+                    bg = "#000000",
+                    green = "#00ff00",
+                    magenta = "#ff00ff",
+                },
+
+                -- Disable or enable colorscheme extensions
+                extensions = {
+                    telescope = true,
+                    notify = true,
+                    mini = true,
+                },
+            })
+        end
+    },
+
     {
         "catppuccin/nvim",
         name = "catppuccin", -- catppuccin-latte, catppuccin-frappe, catppuccin-macchiato, catppuccin-mocha
@@ -193,6 +278,7 @@ return {
         config = function()
             require('rose-pine').setup({
                 disable_background = true,
+                variant = "moon",
                 styles = {
                     italic = false,
                 },
@@ -295,39 +381,26 @@ return {
     },
     -- Using Lazy
     {
-        "navarasu/onedark.nvim",
-        priority = 1000, -- make sure to load this before all the other start plugins
+        "olimorris/onedarkpro.nvim",
+        priority = 1000, -- Ensure it loads first
         config = function()
-            require('onedark').setup {
-                style = 'warm', -- dark, darker, cool, deep, warm, warmer, light
-                transparent = true
-            }
-            -- Enable theme
-            require('onedark').load()
+            require("onedarkpro").setup({
+                options = {
+                    transparency = true
+                }
+            })
+        end
+    },
+
+    {
+        "folke/tokyonight.nvim",
+        lazy = false,
+        priority = 1000,
+        opts = {
+            transparent = true,
+        },
+        config = function(_, opts)
+            require("tokyonight").setup(opts)
         end
     }
-
-
-    -- {
-    --     "tiagovla/tokyodark.nvim",
-    --     name = "tokyo-dark",
-    --     opts = {
-    --         transparent_background = true, -- set background to transparent
-    --         gamma = 1.00, -- adjust the brightness of the theme
-    --         styles = {
-    --             comments = { italic = true }, -- style for comments
-    --             keywords = { italic = true }, -- style for keywords
-    --             identifiers = { italic = true }, -- style for identifiers
-    --             functions = {}, -- style for functions
-    --             variables = {}, -- style for variables
-    --         },
-    --         custom_highlights = {} or function(highlights, palette) return {} end, -- extend highlights
-    --         custom_palette = {} or function(palette) return {} end, -- extend palette
-    --         terminal_colors = true, -- enable terminal colors
-    --     },
-    --     config = function(_, opts)
-    --         require("tokyodark").setup(opts) -- calling setup is optional
-    --         vim.cmd [[colorscheme tokyodark]]
-    --     end,
-    -- }
 }

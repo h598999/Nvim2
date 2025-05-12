@@ -1,0 +1,120 @@
+local M = {}
+
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+local conf = require("telescope.config").values
+
+local scheme_file = vim.fn.stdpath("cache") .. "/last_colorscheme.txt"
+
+local colorSchemes = {
+  "rose-pine",
+  "gruvbox",
+  "github_dark",
+  "github_light",
+  "github_dark_default",
+  "github_dark_high_contrast",
+  "github_dark_dimmed",
+  "onedark",
+  "onelight",
+  "onedark_vivid",
+  "onedark_dark",
+  "vaporwave",
+  "material",
+  "catppuccin-latte",
+  "catppuccin-frappe",
+  "catppuccin-macchiato",
+  "catppuccin-mocha",
+  "tokyodark"
+}
+
+-- M.set_colorscheme = function(name)
+--   vim.cmd.colorscheme(name)
+--   vim.fn.writefile({ name }, scheme_file)
+-- end
+
+M.toggle_next = function()
+  local current = vim.fn.readfile(scheme_file)[1] or colorSchemes[1]
+  local i = 1
+  for idx, val in ipairs(colorSchemes) do
+    if val == current then
+      i = idx
+      break
+    end
+  end
+  i = (i % #colorSchemes) + 1
+  M.set_colorscheme(colorSchemes[i])
+  print("Colorscheme: " .. colorSchemes[i])
+end
+
+M.init = function()
+  local ok, lines = pcall(vim.fn.readfile, scheme_file)
+  if ok and lines[1] then
+    pcall(vim.cmd.colorscheme, lines[1])
+  else
+    vim.cmd.colorscheme("rose-pine")
+  end
+end
+
+M.pick_colorscheme = function()
+  local original_scheme = vim.g.colors_name or "default"
+  pickers.new({}, {
+    prompt_title = "Select Colorscheme",
+    finder = finders.new_table {
+      results = colorSchemes,
+      entry_maker = function(name)
+          return {
+              value = name,
+              display = name,
+              ordinal = name,
+              filename = vim.api.nvim_buf_get_name(0),
+          }
+      end
+    },
+    sorter = conf.generic_sorter({}),
+    previewer = conf.file_previewer({}),
+    attach_mappings = function(prompt_bufnr, map)
+      local preview_applied = nil
+      -- local picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+
+      local timer = vim.loop.new_timer()
+      timer:start(100,100, vim.schedule_wrap(function()
+            local entry = action_state.get_selected_entry()
+            if entry and entry.value and entry.value ~= preview_applied then
+                pcall(vim.cmd.colorscheme, entry.value)
+                preview_applied = entry.value
+            end
+      end))
+
+      local function close_and_restore()
+          timer:stop()
+          timer:close()
+          actions.close(prompt_bufnr)
+      end
+      map("i", "<CR>", function()
+          close_and_restore()
+          local selection = action_state.get_selected_entry()
+          if selection and selection.value then
+              vim.cmd.colorscheme(selection.value)
+              vim.fn.writefile({ selection.value }, vim.fn.stdpath("cache") .. "/last_colorscheme.txt")
+          end
+      end)
+
+      -- Cancel -> restore original
+      map("i", "<Esc>", function()
+        actions.close(prompt_bufnr)
+        pcall(vim.cmd.colorscheme, original_scheme)
+      end)
+
+      map("n", "<Esc>", function()
+        actions.close(prompt_bufnr)
+        pcall(vim.cmd.colorscheme, original_scheme)
+      end)
+
+      return true
+    end,
+  }):find()
+end
+
+return M

@@ -10,7 +10,8 @@ return {
 
           require('telescope').setup{
               defaults = {
-                  file_ignore_patterns = { "%.class", "%.Identifier", "%.cmd", "env/*", "squashfs-root/*", "%.so", "target/*"}
+                  file_ignore_patterns = { "%.class", "%.Identifier", "%.cmd", "env/*", "squashfs-root/*", "%.so", "target/*"},
+                  border = false
               }
           }
       end

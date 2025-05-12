@@ -75,7 +75,23 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", '"_dp')
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set("n", "gb", ":b#<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<C-j>", ":cnext<CR>", {noremap = true, silent = true})
+vim.keymap.set("n", "<C-k>", ":cprev<CR>", {noremap = true, silent = true})
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "Trouble",
+  callback = function()
+    local opts = { buffer = true, desc = "Trouble navigation" }
+
+    vim.keymap.set("n", "<C-j>", function()
+      require("trouble").next({ skip_groups = true, jump = true })
+    end, opts)
+
+    vim.keymap.set("n", "<C-k>", function()
+      require("trouble").prev({ skip_groups = true, jump = true })
+    end, opts)
+  end,
+})
 -- vim.keymap.set('i', '<RIGHT>', 'copilot#Accept("\\<CR>")', {
     --     expr = true,
     --     replace_keycodes = false
@@ -105,6 +121,10 @@ local function toggle_wrap()
   vim.opt.wrap = not vim.opt.wrap:get()
 end
 
+vim.keymap.set('n', '<leader>ot', ':e ~/orgfiles/todo.org<CR>', { desc = 'Open Org TODO file' })
+vim.keymap.set('n', '<leader>op', ':e ~/orgfiles/project.org<CR>', { desc = 'Open Org Project file' })
+vim.keymap.set('n', '<leader>on', ':e ~/orgfiles/refile.org<CR>', { desc = 'Open Org refile file' })
+
 -- Normal mode mapping (e.g., <leader>tw)
 vim.keymap.set('n', '<leader>tw', toggle_wrap, { noremap = true, silent = true, desc = "Toggle line wrapping" })
     vim.opt.rtp:prepend(lazypath)
@@ -124,35 +144,28 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
-local schemeFile = vim.fn.stdpath("cache").."/last_colorscheme.txt"
-local colorSchemes = {"catppuccin", "rose-pine", "gruvbox", "github_dark", "onedark", "material"}
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  callback = function()
+    local save_cursor = vim.fn.getpos(".")
+    vim.cmd([[%s/\s\+$//e]])
+    vim.fn.setpos(".", save_cursor)
+  end,
+})
 
-local fileRead = io.open(schemeFile, "r")
-local i = 1;
-if fileRead then
-    local contents = tonumber(fileRead:read("*a"))
-    if contents then
-        i = contents
-    end
-end
+-- local scheme = require("colorscheme_picker")
+--
+-- -- Load saved scheme on startup
+-- scheme.init()
 
-local function toggleScheme()
-    if (i >= #colorSchemes) then
-        i = 1
-    else
-        i = i+1
-    end
-    local color = colorSchemes[i]
-    ColorMyPencils(color)
+-- Keybindings
+-- vim.keymap.set("n", "<leader>cs", scheme.toggle_next, { desc = "Toggle colorscheme" })
+-- vim.keymap.set("n", "<leader>fs", scheme.pick_colorscheme, { desc = "Pick colorscheme" })
 
-    local writeFile = io.open(schemeFile, "w")
-    if writeFile then
-        writeFile:write(i)
-        writeFile:close()
-    end
-    print(colorSchemes[i])
-end
-
-vim.keymap.set('n', '<leader>cs', toggleScheme,{ noremap = true, silent = true, desc = "Toggle colorScheme" })
-
-ColorMyPencils(colorSchemes[i]);
+-- local file = vim.fn.stdpath("cache") .. "/last_colorscheme.txt"
+--
+-- local current = vim.fn.readfile(file)[1] or "nvim"
+--
+-- vim.cmd.colorscheme(current)
+-- local scheme = require("cs_picker")
+-- scheme.init()
