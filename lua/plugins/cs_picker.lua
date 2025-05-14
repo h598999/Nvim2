@@ -1,6 +1,6 @@
 return {
-    dir = "~/Prosjekt/cs_picker",
-    name = "cs_picker",
+    "h598999/cs_picker",
+    dependencies = { "nvim-telescope/telescope.nvim" },
     lazy = false,
     priority = 1000, -- make sure it loads early
     config = function()

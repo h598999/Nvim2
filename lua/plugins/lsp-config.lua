@@ -1,3 +1,22 @@
+ local on_attach = function(client, bufnr)
+    -- only set up formatting if the server advertises it
+    if client.server_capabilities.documentFormattingProvider then
+      -- <leader>ft to format
+      vim.api.nvim_buf_set_keymap(bufnr, "n", "<leader>ft",
+        "<cmd>lua vim.lsp.buf.format({ async = true })<CR>",
+        { noremap = true, silent = true }
+      )
+      -- (optional) format on save:
+      -- vim.api.nvim_exec([[
+      --   augroup LspFmt
+      --     autocmd! * <buffer>
+      --     autocmd BufWritePre <buffer> lua vim.lsp.buf.format({ async = false })
+      --   augroup END
+      -- ]], false)
+    end
+  end
+
+
 return {
     {
         "rafamadriz/friendly-snippets",
@@ -53,14 +72,29 @@ return {
                     },
                 },
             })
+
+            lspconfig.kotlin_language_server.setup({
+                capabilities = capabilities;
+                cmd = {"/home/jonas/.local/opt/kotlin-language-server/server/bin/kotlin-language-server"},
+                settings = {
+                    kotlin = {
+                        format = {
+                            enable = true,
+                            ktlint = {
+                                path = "ktlint",
+                            },
+                        },
+                    },
+                },
+                on_attach = on_attach
+            })
+
             lspconfig.rust_analyzer.setup({ capabilities = capabilities })
             lspconfig.svelte.setup({ capabilities = capabilities })
             lspconfig.sqlls.setup({ capabilities = capabilities })
             lspconfig.csharp_ls.setup({ capabilities = capabilities })
             lspconfig.sqls.setup({ capabilities = capabilities })
             lspconfig.cssls.setup({ capabilities = capabilities })
-            lspconfig.angularls.setup({ capabilities = capabilities })
-            lspconfig.hls.setup({ capabilities = capabilities })
             lspconfig.intelephense.setup({ capabilities = capabilities })
             lspconfig.hls.setup({ capabilities = capabilities })
             lspconfig.ltex.setup({
@@ -81,6 +115,7 @@ return {
 
             lspconfig.ts_ls.setup({
                 capabilities = capabilities,
+                on_attach =on_attach,
                 init_options = {
                     plugins = {
                         {
@@ -93,7 +128,7 @@ return {
                 filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
             })
 
-            lspconfig.volar.setup({ filetypes = { "vue" }, capabilities = capabilities })
+            -- lspconfig.volar.setup({ filetypes = { "vue" }, capabilities = capabilities })
             lspconfig.html.setup({ filetypes = { "html, cshtml" }, capabilities = capabilities })
             lspconfig.htmx.setup({ capabilities = capabilities })
             -- lspconfig.jdtls.setup({ capabilities = capabilities })
@@ -114,45 +149,6 @@ return {
                 capabilities = capabilities,
             })
 
-            lspconfig.kotlin_language_server.setup({
-                capabilities = capabilities,
-                settings = {
-                    kotlin = {
-                        diagnostics = {
-                            enabled = true,
-                            debounceTime = 100, -- make updates more responsive
-                            level = "hint",     -- "error" | "warning" | "hint"
-                        },
-                        completion = {
-                            snippets = {
-                                enabled = true,
-                            },
-                        },
-                        languageServer = {
-                            watchFiles = {
-                                "**/*.kt",
-                                "**/*.kts",
-                                "**/*.java",
-                                "**/pom.xml",
-                                "**/build.gradle",
-                                "**/settings.gradle"
-                            },
-                            transport = "stdio",
-                            enabled = true
-                        },
-                        codegen = {
-                            enabled = true
-                        },
-                        debounceTime = 100, -- top-level debounce
-                        indexing = {
-                            enabled = true
-                        },
-                        trace = {
-                            server = "verbose"
-                        }
-                    }
-                }
-            })
             lspconfig.bashls.setup({ capabilities = capabilities, filetypes = { "zsh", "sh" } })
 
             vim.api.nvim_create_autocmd("LspAttach", {
