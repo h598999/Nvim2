@@ -96,7 +96,6 @@ vim.api.nvim_create_autocmd("FileType", {
     --     expr = true,
     --     replace_keycodes = false
     -- })
-    -- vim.g.copilot_no_tab_map = true
 
     -- REMAP DONE --
     vim.api.nvim_set_hl(0, "FloatBorder", {bg='#3B4252', fg='#5E81AC'});
@@ -155,7 +154,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 
 -- local scheme = require("colorscheme_picker")
 --
--- -- Load saved scheme on startup
+-- Load saved scheme on startup
 -- scheme.init()
 
 -- Keybindings
